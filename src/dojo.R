@@ -1,0 +1,3 @@
+dojo <- function() {
+    42
+}
