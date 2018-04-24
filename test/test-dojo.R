@@ -78,3 +78,4 @@ test_that("wraps compicated text correctly", {
         paste(rep("a", 300), collapse = "\n")
     )
 })
+
