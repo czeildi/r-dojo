@@ -1,31 +1,49 @@
-library("stringr")
+library(purrr)
+library(stringr)
 
-encrypt <- function(text, times) {
-    once_encrypted <- encrypt_once(text)
-    if (times == 1) {
-        return(once_encrypted)
-    }
-    encrypt(once_encrypted, times - 1)
+reformat <- function(lines) {
+    length_of_standard_lhs <- calculate_length_of_standard_lhs(lines)
+    
+    modify_vec_if(
+        lines, 
+        contains_operator,
+        ~reformat_line(.x, length_of_standard_lhs) 
+    )
 }
 
-encrypt_once <- function(text){
-    encrypted_text <- purrr::map(
-        c(0, 1),
-        function(remainder) {
-            subset_text_by_remainders(text, remainder)
-        }
-    ) %>% 
-        unlist() %>% 
+calculate_length_of_standard_lhs <- function(lines) {
+    lhs_lengths <- map_int(lines, ~str_length(lhs(.x)))
+    max(lhs_lengths)
+}
+
+contains_operator <- function(line) {
+    !is.na(rhs(line))
+}
+
+reformat_line <- function(line, length_of_standard_lhs) {
+    spaces <- additional_lhs_spaces(line, length_of_standard_lhs)
+    
+    paste0(
+        lhs(line), spaces,
+        "=",
+        rhs(line)
+    )
+}
+
+additional_lhs_spaces <- function(line, length_of_standard_lhs) {
+    num_needed_spaces <- length_of_standard_lhs - str_length(lhs(line))
+    rep(" ", num_needed_spaces) %>% 
         paste(collapse = "")
 }
 
-subset_text_by_remainders <- function(text, remainder){
-    split_text_to_characters(text) %>% 
-        .[(1:length(.)) %% 2 == remainder] %>% 
-        paste(collapse = "")
+lhs <- function(line) {
+    str_split(line, "=")[[1]][1]
 }
 
+rhs <- function(line) {
+    str_split(line, "=")[[1]][2]
+}
 
-split_text_to_characters <- function (text) {
-    str_split(text, "")[[1]]
+modify_vec_if <- function(.x, .p, .f, ...) {
+    modify_if(.x, .p, .f, ...) %>% unlist()
 }

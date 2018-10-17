@@ -2,40 +2,85 @@ source("../src/dojo.R")
 
 context("dojo")
 
-test_that("encrypted 1 character string returns itself", {
+test_that("reformatted empty string is empty string", {
     expect_equal(
-        encrypt(text = "g", 1),
-        "g"
+        reformat(""),
+        ""
     )
 })
 
-
-test_that("encrypted 2 character string returns itself reversed after one iteration", {
+test_that("one liners are returned as is", {
     expect_equal(
-        encrypt(text = "ga", 1),
-        "ag"
+        reformat("one  = liner"),
+        "one  = liner"
     )
 })
 
-test_that("abc encrpyted once returns bac", {
+test_that("if 2nd line starts with 1-char shorter LHS, 1 space is inserted", {
     expect_equal(
-        encrypt(text = "abc", 1),
-        "bac"
-    )    
+        reformat(c(
+            "aa = bb",
+            "a = bb"
+        )),
+        c(
+            "aa = bb",
+            "a  = bb"
+        )
+    )
 })
 
-
-test_that("longer encrpyted text is correct", {
+test_that("if 2nd line does not contain operator, it is returned as is", {
     expect_equal(
-        encrypt(text = "This is a test!", 1),
-        "hsi  etTi sats!"
-    )    
+        reformat(c(
+            "aaaa = bb",
+            "a b"
+        )),
+        c(
+            "aaaa = bb",
+            "a b"
+        )   
+    )
 })
 
-
-test_that("encryption is repeated by given times", {
+test_that("if 2nd line starts with n-char shorter LHS, n spaces are inserted", {
     expect_equal(
-        encrypt(text = "This is a test!", 3),
-        " Tah itse sits!"
-    )    
+        reformat(c(
+            "aaaa = bb",
+            "a = bb"
+        )),
+        c(
+            "aaaa = bb",
+            "a    = bb"
+        )   
+    )
+})
+
+test_that("reformats all lines such that lhs is not shorter than first line", {
+    expect_equal(
+        reformat(c(
+            "aaaa = bb",
+            "aaa = bb",
+            "aa = bb"
+        )),
+        c(
+            "aaaa = bb",
+            "aaa  = bb",
+            "aa   = bb"
+        )
+    )
+})
+
+test_that("reformats all lines to align with longest LHS", {
+    expect_equal(
+        reformat(c(
+            "aa = bb",
+            "aaaa = bb",
+            "aaa = bb"
+        )),
+        c(
+            "aa   = bb",
+            "aaaa = bb",
+            "aaa  = bb"
+        )
+    )
 })
