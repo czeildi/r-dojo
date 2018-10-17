@@ -1,5 +1,3 @@
-source("../src/dojo.R")
-
 context("dojo")
 
 test_that("dummy", {
