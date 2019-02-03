@@ -1,2 +1,6 @@
 library("stringr")
 library("purrr")
+library("tibble")
+library("magrittr")
+library("dplyr")
+library("data.table")
